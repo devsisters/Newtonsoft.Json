@@ -44,7 +44,6 @@ namespace Newtonsoft.Json.Serialization
 {
     internal static class JsonTypeReflector
     {
-        private static bool? _dynamicCodeGeneration;
         private static bool? _fullyTrusted;
 
         public const string IdPropertyName = "$id";
@@ -443,44 +442,7 @@ namespace Newtonsoft.Json.Serialization
         {
             _fullyTrusted = fullyTrusted;
         }
-
-        internal static void SetDynamicCodeGeneration(bool dynamicCodeGeneration)
-        {
-            _dynamicCodeGeneration = dynamicCodeGeneration;
-        }
 #endif
-
-        public static bool DynamicCodeGeneration
-        {
-#if HAVE_SECURITY_SAFE_CRITICAL_ATTRIBUTE
-            [SecuritySafeCritical]
-#endif
-            get
-            {
-                if (_dynamicCodeGeneration == null)
-                {
-#if HAVE_CAS
-                    try
-                    {
-                        new ReflectionPermission(ReflectionPermissionFlag.MemberAccess).Demand();
-                        new ReflectionPermission(ReflectionPermissionFlag.RestrictedMemberAccess).Demand();
-                        new SecurityPermission(SecurityPermissionFlag.SkipVerification).Demand();
-                        new SecurityPermission(SecurityPermissionFlag.UnmanagedCode).Demand();
-                        new SecurityPermission(PermissionState.Unrestricted).Demand();
-                        _dynamicCodeGeneration = true;
-                    }
-                    catch (Exception)
-                    {
-                        _dynamicCodeGeneration = false;
-                    }
-#else
-                    _dynamicCodeGeneration = false;
-#endif
-                }
-
-                return _dynamicCodeGeneration.GetValueOrDefault();
-            }
-        }
 
         public static bool FullyTrusted
         {
@@ -515,11 +477,6 @@ namespace Newtonsoft.Json.Serialization
         {
             get
             {
-                if (DynamicCodeGeneration)
-                {
-                    return DynamicReflectionDelegateFactory.Instance;
-                }
-
                 return LateBoundReflectionDelegateFactory.Instance;
             }
         }

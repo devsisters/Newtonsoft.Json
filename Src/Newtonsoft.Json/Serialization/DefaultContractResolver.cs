@@ -102,15 +102,6 @@ namespace Newtonsoft.Json.Serialization
 
         private readonly ThreadSafeStore<Type, JsonContract> _contractCache;
 
-        /// <summary>
-        /// Gets a value indicating whether members are being get and set using dynamic code generation.
-        /// This value is determined by the runtime permissions available.
-        /// </summary>
-        /// <value>
-        /// 	<c>true</c> if using dynamic code generation; otherwise, <c>false</c>.
-        /// </value>
-        public bool DynamicCodeGeneration => JsonTypeReflector.DynamicCodeGeneration;
-
 #if !PORTABLE
         /// <summary>
         /// Gets or sets the default members search flags.
@@ -1400,20 +1391,7 @@ namespace Newtonsoft.Json.Serialization
             // warning - this method use to cause errors with Intellitrace. Retest in VS Ultimate after changes
             IValueProvider valueProvider;
 
-#if !(PORTABLE40 || PORTABLE || DOTNET || NETSTANDARD2_0)
-            if (DynamicCodeGeneration)
-            {
-                valueProvider = new DynamicValueProvider(member);
-            }
-            else
-            {
-                valueProvider = new ReflectionValueProvider(member);
-            }
-#elif !(PORTABLE40)
-            valueProvider = new ExpressionValueProvider(member);
-#else
             valueProvider = new ReflectionValueProvider(member);
-#endif
 
             return valueProvider;
         }
